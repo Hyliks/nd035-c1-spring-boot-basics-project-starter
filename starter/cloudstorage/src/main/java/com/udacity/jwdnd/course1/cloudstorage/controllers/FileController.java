@@ -13,10 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.core.io.Resource;
@@ -45,8 +42,10 @@ public class FileController {
         try {
             File file = this.fileService.getFileByName(fileUpload.getOriginalFilename());
 
+            InputStream ins = fileUpload.getInputStream();
+
             if(file == null) {
-                this.fileService.addFile(new File(fileUpload.getOriginalFilename(), fileUpload.getContentType(), String.valueOf(fileUpload.getSize()), fileUpload.getBytes()), activeUser);
+                this.fileService.addFile(new File(fileUpload.getOriginalFilename(), fileUpload.getContentType(), String.valueOf(fileUpload.getSize()), ins), activeUser);
                 model.addAttribute("filesuccess",true);
             } else {
                 model.addAttribute("fileerror","File already exists. Please rename it.");
@@ -61,19 +60,19 @@ public class FileController {
         return "result";
     }
 
-    @GetMapping("/download")
-    public ResponseEntity<Resource> downloadFile(String fileId, Model model, Authentication authentication) {
+    @GetMapping("/download/{fileId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileId, Model model, Authentication authentication) throws IOException{
         User activeUser = this.userService.getActiveUser(authentication);
 
         File file = this.fileService.getFile(Integer.parseInt(fileId),activeUser.getUserId());
 
 
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + file.getFilename() + "\"").body(new ByteArrayResource(file.getFiledata()));
+                "attachment; filename=\"" + file.getFilename() + "\"").body(new ByteArrayResource(file.getFiledata().readAllBytes()));
     }
 
-    @PostMapping("/delete")
-    public String deleteFile(String fileId, Model model, Authentication authentication) {
+    @PostMapping("/delete/{fileId}")
+    public String deleteFile(@PathVariable String fileId, Model model, Authentication authentication) {
         User activeUser = this.userService.getActiveUser(authentication);
 
         this.homeModelService.resetUnEncryptedCredential();

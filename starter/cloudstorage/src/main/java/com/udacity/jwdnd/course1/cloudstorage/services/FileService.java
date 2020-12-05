@@ -38,7 +38,7 @@ public class FileService {
 
     public List<File> getFiles(Integer userId) {
 
-        List<File> files = this.mapper.getFilesWithOutBlob(userId);
+        List<File> files = this.mapper.getFiles(userId);
 
         for(File file: files) {
             file.setFiledata(null);

@@ -1,5 +1,7 @@
 package com.udacity.jwdnd.course1.cloudstorage.selenium;
 
+import com.udacity.jwdnd.course1.cloudstorage.selenium.pages.HomePage;
+import com.udacity.jwdnd.course1.cloudstorage.selenium.pages.LoginPage;
 import com.udacity.jwdnd.course1.cloudstorage.selenium.pages.SignupPage;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterAll;
@@ -18,7 +20,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SignupTestSuite {
+public class GeneralTestSuite {
     @LocalServerPort
     public int port;
 
@@ -44,7 +46,14 @@ public class SignupTestSuite {
     }
 
     @Test
-    public void testUserSignupValid() {
+    public void testUnauthorizedAccessToHome() {
+        driver.get(baseURL + "/home");
+
+        assertEquals(baseURL + "/login",driver.getCurrentUrl());
+    }
+
+    @Test
+    public void testUserAuthorizationWorkflow() {
         String username = "test";
         String password = "whatabadpassword";
 
@@ -53,8 +62,20 @@ public class SignupTestSuite {
         SignupPage signupPage = new SignupPage(driver);
         signupPage.signup("Peter", "Zastoupil", username, password);
 
-        List<WebElement> success = driver.findElements(By.id("signup-success"));
+        driver.get(baseURL + "/login");
 
-        assertEquals(1,success.size());
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.login(username, password);
+
+        assertEquals(baseURL + "/home",driver.getCurrentUrl());
+
+        HomePage homePage = new HomePage(driver);
+        homePage.logout();
+
+        assertEquals(baseURL + "/login",driver.getCurrentUrl());
+
+        driver.get(baseURL + "/home");
+
+        assertEquals(baseURL + "/login",driver.getCurrentUrl());
     }
 }
