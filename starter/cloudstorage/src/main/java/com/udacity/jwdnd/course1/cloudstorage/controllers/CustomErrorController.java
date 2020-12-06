@@ -8,7 +8,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-public class ErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
+public class CustomErrorController implements org.springframework.boot.web.servlet.error.ErrorController {
 
     @Override
     public String getErrorPath() {
@@ -26,11 +26,11 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
 
             // display specific error page
             if (statusCode == HttpStatus.NOT_FOUND.value()) {
-                return "404";
+                return "error";
             } else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-                return "500";
+                return "error";
             } else if (statusCode == HttpStatus.FORBIDDEN.value()) {
-                return "403";
+                return "error";
             }
         }
 
