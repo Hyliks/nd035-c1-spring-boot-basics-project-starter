@@ -71,11 +71,25 @@ public class FileController {
                 "attachment; filename=\"" + file.getFilename() + "\"").body(new ByteArrayResource(file.getFiledata().readAllBytes()));
     }
 
-    @PostMapping("/delete/{fileId}")
+    @GetMapping("/delete/{fileId}")
     public String deleteFile(@PathVariable String fileId, Model model, Authentication authentication) {
         User activeUser = this.userService.getActiveUser(authentication);
 
+        File fileToDelete = new File("","","",null);
+        fileToDelete.setFileId(Integer.parseInt(fileId));
+        fileToDelete.setUserId(activeUser.getUserId());
+
+        try {
+            this.fileService.deleteFile(new File("","","",null));
+            model.addAttribute("filesuccess",true);
+
+        }catch (Exception e) {
+            model.addAttribute("fileerror","File delete failed. Please try again.");
+            model.addAttribute("filesuccess",false);
+        }
+
+
         this.homeModelService.resetUnEncryptedCredential();
-        return "redirect:/home";
+        return "result";
     }
 }

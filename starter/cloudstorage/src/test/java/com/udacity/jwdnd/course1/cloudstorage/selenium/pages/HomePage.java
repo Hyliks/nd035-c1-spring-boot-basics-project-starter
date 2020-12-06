@@ -57,9 +57,9 @@ public class HomePage {
 
     public void changeTab(String tab) {
         switch (tab) {
-            case "note": this.navNoteTab.click(); break;
-            case "file": this.navFileTab.click(); break;
-            case "credential": this.navCredentialTab.click(); break;
+            case "note": ((JavascriptExecutor)driver).executeScript("arguments[0].click();", navNoteTab); break;
+            case "file": ((JavascriptExecutor)driver).executeScript("arguments[0].click();", navFileTab); break;
+            case "credential": ((JavascriptExecutor)driver).executeScript("arguments[0].click();", navCredentialTab); break;
         }
     }
 
@@ -133,8 +133,7 @@ public class HomePage {
 
         WebElement deleteNoteButton = rows.get(index).findElements(By.tagName("td")).get(1).findElement(By.tagName("form")).findElement(By.id("delete-note"));
 
-        deleteNoteButton.click();
-
+        ((JavascriptExecutor)driver).executeScript("arguments[0].click();", deleteNoteButton);
     }
 
     public void addCredential(String url, String username, String password) throws InterruptedException {
